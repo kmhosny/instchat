@@ -18,7 +18,6 @@ class V1::AppsController < ApplicationController
   end
 
   def update
-    byebug
     name = params.require(:name)
     @app.update!(name: name)
     head :no_content
