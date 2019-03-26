@@ -11,8 +11,8 @@ class V1::MessagesController < ApplicationController
 
   def create
     body = params.require(:body)
-    @message = @chat.messages.create!(body: body, chat_id: @chat.id[0], app_id: @chat.id[1])
-    render json: @message, status: :created
+    Redis.current.lpush 'pending_messages', {body: body, chat_id: @chat.id[0], app_id: @chat.id[1]}.to_json
+    render json: {body: body}, status: :created
   end
 
   def show
