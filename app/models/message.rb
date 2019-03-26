@@ -1,5 +1,6 @@
 class Message < ApplicationRecord
   self.primary_keys = :id, :chat_id, :app_id
+  searchkick
   belongs_to :chat, class_name: "Chat", foreign_key: "chat_id"
   belongs_to :chat, class_name: "Chat", foreign_key: "app_id"
 
@@ -18,5 +19,13 @@ class Message < ApplicationRecord
   def last_chatmessage_index
     self.id = [chat.messages.count + 1, self.id[1], self.id[2]]
     self.id
+  end
+
+  def search_data
+    {
+      body: body,
+      chat_id: chat_id,
+      app_id: app_id
+    }
   end
 end

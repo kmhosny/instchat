@@ -4,7 +4,8 @@ class V1::MessagesController < ApplicationController
 
   def index
     page = params[:page] || 1
-    @messages = Message.where(chat_id: params[:chat_id], app_id: params[:app_id]).paginate(page: page)
+    keyword = params[:keyword] || '*'
+    @messages = Message.search(keyword, where:{ chat_id: params[:chat_id], app_id: params[:app_id] }, fields: [body: :text_middle], load: false, page: params[:page]).map{|m| {body: m[:body]}}
     render json: @messages
   end
 
