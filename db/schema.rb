@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_26_143622) do
+ActiveRecord::Schema.define(version: 2019_03_26_223643) do
 
   create_table "apps", id: :string, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "chats_count", default: 0
     t.index ["id"], name: "index_apps_on_id"
   end
 
@@ -24,6 +25,7 @@ ActiveRecord::Schema.define(version: 2019_03_26_143622) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "app_id"
+    t.integer "messages_count", default: 0
     t.index ["app_id"], name: "index_chats_on_app_id"
     t.index ["id", "app_id"], name: "index_chats_on_id_and_app_id", unique: true
   end
@@ -31,7 +33,7 @@ ActiveRecord::Schema.define(version: 2019_03_26_143622) do
   create_table "messages", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "id"
     t.text "body"
-    t.bigint "chat_id"
+    t.integer "chat_id"
     t.string "app_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -41,4 +43,5 @@ ActiveRecord::Schema.define(version: 2019_03_26_143622) do
   end
 
   add_foreign_key "chats", "apps"
+  add_foreign_key "messages", "chats"
 end
