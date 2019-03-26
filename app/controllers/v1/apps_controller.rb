@@ -30,6 +30,6 @@ class V1::AppsController < ApplicationController
 
   private
   def set_app
-    @app = App.find_by!(uid:  params[:id])
+    @app = App.find(params[:id])
   end
 end

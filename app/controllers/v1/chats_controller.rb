@@ -4,7 +4,7 @@ class V1::ChatsController < ApplicationController
 
   def index
     page = params[:page] || 1
-    @chats = Chat.paginate(page: page)
+    @chats = Chat.where(app_id: params[:app_id]).paginate(page: page)
     render json: @chats
   end
 
@@ -28,11 +28,10 @@ class V1::ChatsController < ApplicationController
 
   private
   def set_chat
-    @app = App.find_by!(uid: params[:app_id], )
-    @chat = Chat.find_by!(id:  params[:id], app_id: @app.id)
+    @chat = Chat.find_by!(id:  params[:id], app_id: params[:app_id])
   end
 
   def set_app
-    @app = App.find_by!(uid: params[:app_id])
+    @app = App.find(params[:app_id])
   end
 end

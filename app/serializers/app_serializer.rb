@@ -1,3 +1,3 @@
 class AppSerializer < ActiveModel::Serializer
-  attributes :name, :uid
+  attributes :id, :name
 end
