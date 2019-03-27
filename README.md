@@ -14,12 +14,12 @@
 
 1. sidekiq
 ##### Start the app
-`docker build -t instchat .`
-`docker-compose build`
-`docker-compose up`
-after the app starts initialize the db
-`docker-compose run app rails db:setup`
-`docker-compose run app rails searchkick:reindex:all`
+- `docker build -t instchat .`
+- `docker-compose build`
+- `docker-compose up`
+- after the app starts initialize the db
+- `docker-compose run app rails db:setup`
+- `docker-compose run app rails searchkick:reindex:all`
 
  ##### Design
 The App is designed with 3 tables: Apps, Chats and messages.
@@ -39,11 +39,11 @@ messages:
 
 ##### Using the app:
 
-using `docker ps` get the port used for the app
-list apps `curl http://localhost:{PORT}/v1/apps/`
-create app `curl -X POST http://localhost:{PORT}/v1/apps/ -d name='first'`
-list chats of an app `curl http://localhost:{PORT}/v1/apps/{ID}/chats`
-create chat for an app `curl -X POST http://localhost:{PORT}/v1/apps/{ID}/chats`
-list messages for a given chat on app `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages`
-search messages for a given chat on app `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages?keyword='hello world'`
-create message for a given chat `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages -d body='hello world'`
+- using `docker ps` get the port used for the app
+- list apps `curl http://localhost:{PORT}/v1/apps/`
+- create app `curl -X POST http://localhost:{PORT}/v1/apps/ -d name='first'`
+- list chats of an app `curl http://localhost:{PORT}/v1/apps/{ID}/chats`
+- create chat for an app `curl -X POST http://localhost:{PORT}/v1/apps/{ID}/chats`
+- list messages for a given chat on app `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages`
+- search messages for a given chat on app `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages?keyword='hello world'`
+- create message for a given chat `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages -d body='hello world'`
