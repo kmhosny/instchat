@@ -11,7 +11,9 @@ class V1::MessagesController < ApplicationController
 
   def create
     body = params.require(:body)
-    Redis.current.lpush 'pending_messages', {body: body, chat_id: @chat.id[0], app_id: @chat.id[1]}.to_json
+    #Redis.current.lpush 'pending_messages', {body: body, chat_id: @chat.id}.to_json
+    ActionCable.server.broadcast "#{params[:app_id]}_chat_#{params[:chat_id]}",
+                                   body:  body
     render json: {body: body}, status: :created
   end
 
@@ -30,7 +32,8 @@ class V1::MessagesController < ApplicationController
 
   private
   def set_message
-    @message = Message.find_by!(id:  params[:id], chat_id: params[:chat_id], app_id: params[:app_id])
+    set_chat
+    @message = Message.find_by!(mid:  params[:id], chat_id: @chat.id)
   end
 
   def set_app
@@ -38,6 +41,6 @@ class V1::MessagesController < ApplicationController
   end
 
   def set_chat
-    @chat = Chat.find_by!(id: params[:chat_id], app_id: params[:app_id])
+    @chat = Chat.find_by!(cid: params[:chat_id], app_id: params[:app_id])
   end
 end
