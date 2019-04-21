@@ -6,9 +6,7 @@ class MessageWriteWorker
     unless res.nil?
       data = JSON.parse(res[1])
       Message.transaction do
-        message = Message.create!(body: data["body"], chat_id: data["chat_id"], app_id: data["app_id"])
-        c = Chat.find_by(id: data["chat_id"], app_id: data["app_id"])
-        c.update(messages_count: c.messages.size)
+        message = Message.create!(body: data["body"], chat_id: data["chat_id"])
       end
     end
     MessageWriteWorker.perform_async

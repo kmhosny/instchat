@@ -20,28 +20,25 @@ ActiveRecord::Schema.define(version: 2019_03_26_223643) do
     t.index ["id"], name: "index_apps_on_id"
   end
 
-  create_table "chats", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "id"
+  create_table "chats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "cid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "app_id"
     t.integer "messages_count", default: 0
     t.index ["app_id"], name: "index_chats_on_app_id"
-    t.index ["id", "app_id"], name: "index_chats_on_id_and_app_id", unique: true
+    t.index ["cid", "app_id"], name: "index_chats_on_cid_and_app_id", unique: true
   end
 
-  create_table "messages", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "id"
+  create_table "messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "mid"
     t.text "body"
-    t.integer "chat_id"
-    t.string "app_id"
+    t.bigint "chat_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["app_id"], name: "index_messages_on_app_id"
     t.index ["chat_id"], name: "index_messages_on_chat_id"
-    t.index ["id", "chat_id", "app_id"], name: "index_messages_on_id_and_chat_id_and_app_id", unique: true
+    t.index ["mid", "chat_id"], name: "index_messages_on_mid_and_chat_id", unique: true
   end
 
   add_foreign_key "chats", "apps"
-  add_foreign_key "messages", "chats"
 end
