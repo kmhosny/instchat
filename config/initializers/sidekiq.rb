@@ -9,5 +9,5 @@ Sidekiq.configure_client do |config|
 end
 
 if Sidekiq.server?
-  MessageWriteWorker.perform_async
+  Sidekiq::Cron::Job.create(name: 'MessageWriter from cache to sql', cron: '*/1 * * * *', class: 'MessageWriteWorker')
 end

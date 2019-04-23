@@ -2,13 +2,14 @@ class MessageWriteWorker
   include Sidekiq::Worker
 
   def perform
-    res = Redis.current.blpop('pending_messages', 5)
-    unless res.nil?
-      data = JSON.parse(res[1])
-      Message.transaction do
-        message = Message.create!(body: data["body"], chat_id: data["chat_id"])
-      end
+    begin
+      MessageCache.where(written: false).each do |m|
+        Message.transaction do
+          message = Message.create!(body: m.body, chat_id: m.chat_id, created_at: m.created_at)
+        end
+      end.update_all(written: true)
+    rescue Mongoid::Errors::DocumentNotFound => e
+      Rails.logger.error e.message
     end
-    MessageWriteWorker.perform_async
   end
 end

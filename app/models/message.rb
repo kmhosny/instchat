@@ -13,7 +13,7 @@ class Message < ApplicationRecord
   def search_data
     {
       body: body,
-      chat_id: chat.id,
+      chat_id: chat.cid,
       app_id: chat.app.id
     }
   end
