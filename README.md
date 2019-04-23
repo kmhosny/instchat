@@ -14,12 +14,12 @@
 
 1. sidekiq
 ##### Start the app
-`docker build -t instchat .`
-`docker-compose build`
-`docker-compose up`
-after the app starts initialize the db
-`docker-compose run app rails db:setup`
-`docker-compose run app rails searchkick:reindex:all`
+- `docker build -t instchat .`
+- `docker-compose build`
+- `docker-compose up`
+- after the app starts initialize the db
+- `docker-compose run app rails db:setup`
+- `docker-compose run app rails searchkick:reindex:all`
 
  ##### Design
 The App is designed with 3 tables: Apps, Chats and messages.
@@ -36,14 +36,17 @@ messages:
 - messages uses elasticsearch to fetch and search in messages of a given app using searchkick, but it doesnt load the message object since most elasticsearch gems do not work properly with composite primary keys, it considers the ID as a string of the 3 IDs concatenated by comma, e.g. 'id,chat_id,app_id'='1,1,90nkfndsiu' so when loading it from active record, it doesn't insert the attribute name nor the value properly.
 - to avoid writing the messages during the API request sidekiq was used as background job, a job is started with the boot of the system that listens on a redis key using the blocking redis command lpop, the job stays blocked till the create API pushes the params as json to the key, once pushed the background job creates the actual message and registers the job again. This way the writing is avoided during the API call since writes in this RDMS can be expensive for chatting apps.
 
+##### Notes
+- the option of having composite key of 3 keys isn't the best, a better approach was to have a unique ID column at the chat table and use this only as the composite key with messages ID table.
+- it would be better if action cable was used to realtime message exchange but didnt get the chanve to implement it.
 
 ##### Using the app:
 
-using `docker ps` get the port used for the app
-list apps `curl http://localhost:{PORT}/v1/apps/`
-create app `curl -X POST http://localhost:{PORT}/v1/apps/ -d name='first'`
-list chats of an app `curl http://localhost:{PORT}/v1/apps/{ID}/chats`
-create chat for an app `curl -X POST http://localhost:{PORT}/v1/apps/{ID}/chats`
-list messages for a given chat on app `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages`
-search messages for a given chat on app `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages?keyword='hello world'`
-create message for a given chat `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages -d body='hello world'`
+- using `docker ps` get the port used for the app
+- list apps `curl http://localhost:{PORT}/v1/apps/`
+- create app `curl -X POST http://localhost:{PORT}/v1/apps/ -d name='first'`
+- list chats of an app `curl http://localhost:{PORT}/v1/apps/{ID}/chats`
+- create chat for an app `curl -X POST http://localhost:{PORT}/v1/apps/{ID}/chats`
+- list messages for a given chat on app `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages`
+- search messages for a given chat on app `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages?keyword='hello world'`
+- create message for a given chat `curl http://localhost:{PORT}/v1/apps/{ID}/chats/{ID}/messages -d body='hello world'`
