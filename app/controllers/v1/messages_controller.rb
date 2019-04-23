@@ -5,13 +5,13 @@ class V1::MessagesController < ApplicationController
   def index
     page = params[:page] || 1
     keyword = params[:keyword] || '*'
-    @messages = Message.search(keyword, where:{ chat_id: params[:chat_id], app_id: params[:app_id] }, fields: [body: :text_middle], load: false, page: params[:page]).map{|m| {body: m[:body]}}
+    @messages = Message.search(keyword, where:{ chat_id: params[:chat_id], app_id: params[:app_id] }, fields: [:body], load: false, page: params[:page]).map{|m| {body: m[:body]}}
     render json: @messages
   end
 
   def create
     body = params.require(:body)
-    #Redis.current.lpush 'pending_messages', {body: body, chat_id: @chat.id}.to_json
+    mc = MessageCache.create(body: body, chat_id: @chat.id, app_id: @app.id, written: false)
     ActionCable.server.broadcast "#{params[:app_id]}_chat_#{params[:chat_id]}",
                                    body:  body
     render json: {body: body}, status: :created
