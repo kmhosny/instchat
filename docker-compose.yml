@@ -9,6 +9,7 @@ app:
     - mysql
     - redis
     - elasticsearch
+    - mongo
 mysql:
   image: mysql:5.7.25
   ports:
@@ -23,3 +24,7 @@ elasticsearch:
   image: elasticsearch:6.6.2
   ports:
     - "9200"
+mongo:
+  image: mongo:4.0-xenial
+  ports:
+    - "27017"
