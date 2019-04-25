@@ -18,9 +18,14 @@
 - `docker build -t instchat .`
 - `docker-compose build`
 - `docker-compose up`
+
 - after the app starts initialize the db
 - `docker-compose run app rails db:setup`
 - `docker-compose run app rails searchkick:reindex:all`
+
+- to run test coverage
+- `docker-compose run app rails test test:controllers`
+- `docker-compose run app rails test test/workers/message_write_worker_test.rb`
 
  ##### Design
 The App is designed with 3 tables: Apps, Chats and messages.
