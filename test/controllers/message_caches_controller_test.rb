@@ -2,7 +2,7 @@ require 'test_helper'
 
 class MessageCachesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @message_cach = message_caches(:one)
+    @message_cach = MessageCache.create(app_id: "Zijore38943", body: "Hi Man", chat_id: 231)
   end
 
   test "should get index" do

@@ -4,7 +4,8 @@ class V1::ChatsController < ApplicationController
 
   def index
     page = params[:page] || 1
-    @chats = Chat.where(app_id: params[:app_id]).paginate(page: page)
+    per_page = params[:per_page]
+    @chats = Chat.where(app_id: params[:app_id]).paginate(page: page, per_page: per_page)
     render json: @chats
   end
 

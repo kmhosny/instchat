@@ -157,7 +157,7 @@ test:
     default:
       database: instchat_test
       hosts:
-        - localhost:27017
+        - mongo
       options:
         read:
           mode: :primary

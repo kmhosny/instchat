@@ -2,10 +2,8 @@
 
 one:
   body: MyText
-  chat_id: 
-  app_id: 
+  chat_id:
 
 two:
   body: MyText
   chat_id: 
-  app_id: 
