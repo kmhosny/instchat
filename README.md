@@ -29,7 +29,7 @@ Apps:
 - uses a counter_cache for storing current chat apps belonging to this app.
 
 Chats:
-- a requirement was to have the ability of having all chats belonging to any app to start counting IDs from 1, so we can have 2 chats with ID 1 but their app_id is different, to achieve this, the primary key was left as it is, another key was created and indexed called cid that gets it's value before saving a new chat record, it's value = count of chats on the application + 1.
+- a requirement was to have the ability of having all chats belonging to any app to start counting IDs from 1, so we can have 2 chats with ID 1 but their app_id is different, to achieve this, the primary key was left as it is, another key was created and indexed called (cid) that gets it's value before saving a new chat record, it's value = count of chats on the application + 1.
 
 messages:
 - messages had the same requirement to be able to count starting 1 for each chat on an app, another key was created (mid), it's value = count of messages for this chat + 1, the only foreign key is to chat table.
