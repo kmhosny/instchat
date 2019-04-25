@@ -42,7 +42,7 @@ messages:
 - Action Cable is used to broadcast a message to all the subscribers.
 
 Message Writing operation:
-- [logo]: https://github.com/kmhosny/instchat/blob/master/instchat.png 
+ ![logo](https://github.com/kmhosny/instchat/blob/master/instchat.png)
 
 ##### Using the app:
 
