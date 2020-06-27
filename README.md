@@ -5,6 +5,7 @@
 1. elasticsearch 6.6.2
 1. redis 3.2.3
 1. mysql 5.7
+1. Mongo 4.0
 1. docker version 17.05.0
 1. docker-compose version 1.8.1
 ##### Database creation
@@ -17,9 +18,14 @@
 - `docker build -t instchat .`
 - `docker-compose build`
 - `docker-compose up`
+
 - after the app starts initialize the db
 - `docker-compose run app rails db:setup`
 - `docker-compose run app rails searchkick:reindex:all`
+
+- to run test coverage
+- `docker-compose run app rails test test:controllers`
+- `docker-compose run app rails test test/workers/message_write_worker_test.rb`
 
  ##### Design
 The App is designed with 3 tables: Apps, Chats and messages.
@@ -28,17 +34,20 @@ Apps:
 - uses a counter_cache for storing current chat apps belonging to this app.
 
 Chats:
-- a requirement was to have the ability of having all chats belonging to any app to start counting IDs from 1, so we can have 2 chats with ID 1 but their app_id is different, to achieve this, composite_primary_keys gem was used, now the primary key is id -auto increment by the db- and app_id as foreign_key. this way, 2 chats can have ID of 1 but different apps, the second problem was not to relly on the DB counter for incrementing the chat id, since the ID will keep track only to latest ID used so if the latest chat added had ID 10 then the counter for next chat will be 11 even if it's not in the same app, for this the ID of the chat is set in a before_create observer by fetching the count of chats on the app and adding 1.
+- a requirement was to have the ability of having all chats belonging to any app to start counting IDs from 1, so we can have 2 chats with ID 1 but their app_id is different, to achieve this, the primary key was left as it is, another key was created and indexed called (cid) that gets it's value before saving a new chat record, it's value = count of chats on the application + 1.
 
 messages:
-- messages had the same requirement to be able to count starting 1 for each chat on an app, composite primary key was used again but this time, its a ID, chat_id and app_id. which added some complexity in rails migrations and model to model relation so the fk constraint wasn't added thru db level instead from app level in rails.
-- adding this caused the counter_cache for chat not to work properly so it had to be incremented manually.
-- messages uses elasticsearch to fetch and search in messages of a given app using searchkick, but it doesnt load the message object since most elasticsearch gems do not work properly with composite primary keys, it considers the ID as a string of the 3 IDs concatenated by comma, e.g. 'id,chat_id,app_id'='1,1,90nkfndsiu' so when loading it from active record, it doesn't insert the attribute name nor the value properly.
-- to avoid writing the messages during the API request sidekiq was used as background job, a job is started with the boot of the system that listens on a redis key using the blocking redis command lpop, the job stays blocked till the create API pushes the params as json to the key, once pushed the background job creates the actual message and registers the job again. This way the writing is avoided during the API call since writes in this RDMS can be expensive for chatting apps.
+- messages had the same requirement to be able to count starting 1 for each chat on an app, another key was created (mid), it's value = count of messages for this chat + 1, the only foreign key is to chat table.
 
-##### Notes
-- the option of having composite key of 3 keys isn't the best, a better approach was to have a unique ID column at the chat table and use this only as the composite key with messages ID table.
-- it would be better if action cable was used to realtime message exchange but didnt get the chanve to implement it.
+- messages uses elasticsearch to fetch and search in messages of a given app using searchkick
+
+- to avoid persisting the messages during the API request directly to mysql which would cause delays, mongodb was used for persisting the message, a cron job works in the background to persist the message to mysql. after creating the mongodb document the message is broadcasted to it's respective channel.
+- When the message is persisted to mongodb, a flag written = false is created for each message, the cron job logic is to fetch messages that still have written = false, write the messages that satisfy this criteria then mark all these objects as written true to flag that it was moved to mysql.
+
+- Action Cable is used to broadcast a message to all the subscribers.
+
+Message Writing operation:
+ ![logo](https://github.com/kmhosny/instchat/blob/master/instchat.png)
 
 ##### Using the app:
 
